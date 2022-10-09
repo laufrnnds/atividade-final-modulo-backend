@@ -37,9 +37,12 @@ const RecadoAccordion: React.FC<RecadoAccordionProps> = ({ id, descricao,detalha
     localStorage.setItem('idRecado', `${id}`);
     localStorage.setItem('descriRecado', `${descricao}`);
     localStorage.setItem('detRecado', `${detalhamento}`);
-    
+
     dispatch(checkBotoes(false));
-    dispatch(checkForm(!estadoForm));
+    setTimeout( () =>{
+      dispatch(checkForm(!estadoForm))
+    },2000)
+    
   };
   const handleApagar = () => {
     dispatch(excluirRecado(id));

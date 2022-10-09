@@ -10,7 +10,6 @@ import { buscarRecados } from '../../store/Recados/RecadosSlice';
 const Home: React.FC = () => {
   const dispatch = useAppDispatch();
 
-
   useEffect(()=>{
     dispatch(buscarRecados());
   },[]);
