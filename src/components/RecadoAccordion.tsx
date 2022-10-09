@@ -34,11 +34,12 @@ const RecadoAccordion: React.FC<RecadoAccordionProps> = ({ id, descricao,detalha
   const dispatch = useAppDispatch();
 
   const handleEditar = () => {
-    dispatch(checkBotoes(false));
-    dispatch(checkForm(!estadoForm));
     localStorage.setItem('idRecado', `${id}`);
     localStorage.setItem('descriRecado', `${descricao}`);
     localStorage.setItem('detRecado', `${detalhamento}`);
+    
+    dispatch(checkBotoes(false));
+    dispatch(checkForm(!estadoForm));
   };
   const handleApagar = () => {
     dispatch(excluirRecado(id));
