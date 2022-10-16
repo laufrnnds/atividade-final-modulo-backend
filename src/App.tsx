@@ -6,6 +6,7 @@ import defaultTheme from './config/theme/Default';
 import Home from './pages/Home/Home';
 import AppRoutes from './routes/AppRoutes';
 import { store } from './store';
+import './index.css'
 
 function App() {
   return (

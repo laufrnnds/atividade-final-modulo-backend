@@ -6,9 +6,11 @@ import {
 import { RootState } from "..";
 import {
   atualizarRecadoApi,
+  buscarRecadoIdApi,
   buscarRecadosApi,
   criarRecadoApi,
   excluirRecadoApi,
+  filtrarRecadosApi,
 } from "../../service/api";
 import { Recado, RecadoRequest } from "./types";
 
@@ -16,6 +18,12 @@ export interface RecadosSliceParametro {
   id: number;
   descricao: string;
   detalhamento: string;
+  status: string;
+}
+
+export interface RecadoBuscado {
+  busca: string;
+  operacao: string;
 }
 
 export const buscarRecados = createAsyncThunk(
@@ -53,6 +61,26 @@ export const excluirRecado = createAsyncThunk(
   }
 );
 
+export const buscarRecadoId = createAsyncThunk(
+  "recados/buscarRecadoId",
+  async (id: number) => {
+    const url = `/${id}`;
+    const response = await buscarRecadoIdApi(url);
+    return response;
+  }
+);
+
+export const filtrarRecados = createAsyncThunk(
+  "recados/filtrarRecados",
+  async (dado: RecadoBuscado) => {
+    const response = await filtrarRecadosApi("/filter", {
+      busca: dado.busca,
+      operacao: dado.operacao,
+    });
+    return response;
+  }
+);
+
 const adapter = createEntityAdapter<RecadosSliceParametro>({
   selectId: (item) => item.id,
 });
@@ -68,6 +96,7 @@ const RecadosSlice = createSlice({
     addOne: adapter.addOne,
     updateOne: adapter.updateOne,
     removeOne: adapter.removeOne,
+    setAll: adapter.setAll,
   },
   extraReducers(builder) {
     builder.addCase(buscarRecados.pending, (state, action) => {
@@ -89,8 +118,13 @@ const RecadosSlice = createSlice({
       state.loading = false;
       console.log(action.payload);
     });
+    builder.addCase(filtrarRecados.fulfilled, (state, action) => {
+      state.loading = false;
+      adapter.setAll(state, action.payload);
+      console.log(action.payload);
+    });
   },
 });
 
-export const { addOne, updateOne, removeOne } = RecadosSlice.actions;
+export const { addOne, updateOne, removeOne, setAll } = RecadosSlice.actions;
 export default RecadosSlice.reducer;

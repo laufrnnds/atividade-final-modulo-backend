@@ -1,15 +1,15 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState: any = {
-    check: true,
+  check: true,
 };
 
 const BotoesSlice = createSlice({
-  name: 'botoes',
+  name: "botoes",
   initialState,
   reducers: {
-    checkBotoes(state, payload){
-        state.check = payload;
+    checkBotoes(state, payload) {
+      state.check = payload;
     },
   },
 });
