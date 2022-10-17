@@ -19,6 +19,7 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 import CancelIcon from "@mui/icons-material/Cancel";
 import ButtonStyled from "./ButtonStyled";
+import { checkMostrar } from "../store/Mostrar/MostrarSlice";
 
 const BoxForm = styled(Box)({
   width: "50%",
@@ -80,6 +81,7 @@ const Filtragem: React.FC = () => {
 
   const handleBusca = () => {
     dispatch(filtrarRecados({ busca: busca, operacao: value }));
+    dispatch(checkMostrar(false));
   };
 
   const handleCancelFormFiltro = () => {

@@ -18,7 +18,7 @@ const RecadosContent: React.FC = () => {
               id={recado.id}
               descricao={recado.descricao}
               detalhamento={recado.detalhamento}
-              status={`${recado.status}`}
+              status={recado.status}
               dado={recado}
               color={defaultTheme.palette.secondary.main}
               arquivado={false}
