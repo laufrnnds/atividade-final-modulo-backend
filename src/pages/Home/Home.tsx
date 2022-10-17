@@ -8,24 +8,15 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { buscarRecados } from "../../store/Recados/RecadosSlice";
 import Filtragem from "../../components/Filtragem";
 import defaultTheme from "../../config/theme/Default";
-import { checkMostrar } from "../../store/Mostrar/MostrarSlice";
+import { checkMostrar, selectMostrar } from "../../store/Mostrar/MostrarSlice";
 import FileDownloadOffIcon from "@mui/icons-material/FileDownloadOff";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-
-const BtnStyled = styled(Button)({
-  margin: "5px",
-  "&:hover": {
-    backgroundColor: defaultTheme.palette.primary.light,
-  },
-  backgroundColor: defaultTheme.palette.primary.main,
-  fontFamily: '"Josefin Sans", sans-serif',
-});
+import ButtonStyled from "../../components/ButtonStyled";
+import RecadosContentArquiv from "../../components/RecadosContentArquiv";
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch();
-  const estadoMostrar = useAppSelector(
-    (state) => state.mostrar.mostrou.payload
-  );
+  const estadoMostrar = useAppSelector(selectMostrar).mostrou;
 
   useEffect(() => {
     dispatch(buscarRecados());
@@ -33,12 +24,10 @@ const Home: React.FC = () => {
   }, []);
 
   const handleArquivados = () => {
-    console.log("entrou arquivar");
     dispatch(checkMostrar(true));
   };
 
   const handleNaoArquivados = () => {
-    console.log("entrou não arquivar");
     dispatch(checkMostrar(false));
   };
 
@@ -65,13 +54,20 @@ const Home: React.FC = () => {
       <Formulario />
       <Filtragem />
       {estadoMostrar == false ? (
-        <BtnStyled variant="contained" onClick={handleArquivados}>
-          <FileDownloadIcon />
-        </BtnStyled>
+        <ButtonStyled
+          onClick={handleArquivados}
+          icon={<FileDownloadIcon />}
+          txt={"Arquivados"}
+        />
       ) : (
-        <BtnStyled variant="contained" onClick={handleNaoArquivados}>
-          <FileDownloadOffIcon />
-        </BtnStyled>
+        <>
+          <ButtonStyled
+            onClick={handleNaoArquivados}
+            icon={<FileDownloadOffIcon />}
+            txt={"Desarquivados"}
+          />
+          <RecadosContentArquiv />
+        </>
       )}
       <RecadosContent />
     </Box>

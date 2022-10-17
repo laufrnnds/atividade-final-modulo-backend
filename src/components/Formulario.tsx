@@ -3,29 +3,18 @@ import { TextField, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import defaultTheme from "../config/theme/Default";
-import { checkBotoes } from "../store/Botoes/BotoesSlice";
-import { checkForm } from "../store/Form/FormSlice";
+import { checkBotoes, selectBotao } from "../store/Botoes/BotoesSlice";
+import { checkForm, selectForm } from "../store/Form/FormSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import {
-  atualizarRecado,
-  criarRecado,
-  updateOne,
-} from "../store/Recados/RecadosSlice";
-import { Recado, RecadoRequest } from "../store/Recados/types";
+import { atualizarRecado, criarRecado } from "../store/Recados/RecadosSlice";
+import { Recado, RecadoRequest, Status } from "../store/Recados/types";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { limparInfo } from "../store/RecadoBuscado/RecadoBuscado";
-
-const BtnStyled = styled(Button)({
-  margin: "5px",
-  "&:hover": {
-    backgroundColor: defaultTheme.palette.primary.light,
-  },
-  backgroundColor: defaultTheme.palette.primary.main,
-  fontFamily: '"Josefin Sans", sans-serif',
-});
+import ButtonStyled from "./ButtonStyled";
+import { selectRecado } from "../store/Recados/RecadoSlice";
+import { checkMostrar } from "../store/Mostrar/MostrarSlice";
 
 const BoxForm = styled(Box)({
   width: "50%",
@@ -62,70 +51,62 @@ const BoxButtons = styled(Box)({
 });
 
 const Formulario: React.FC = () => {
-  const [descri, setDescri] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [status, setStatus] = useState("concluido");
-  const [det, setDet] = useState("");
-  const estadoForm = useAppSelector((state) => state.form.aparece.payload);
-  const recadoBuscado = useAppSelector((state) => state.recadobuscado);
-  const estadoBotao = useAppSelector((state) => state.botoes.check.payload);
+  const [detalhamento, setDetalhamento] = useState("");
+  const estadoForm = useAppSelector(selectForm).aparece;
+  const recado = useAppSelector(selectRecado);
+  const estadoBotao = useAppSelector(selectBotao).check;
   const dispatch = useAppDispatch();
 
   const handleFormulario = () => {
-    if (!estadoForm) {
-      dispatch(checkForm(false));
-    }
-    dispatch(checkForm(!estadoForm));
+    dispatch(checkForm(true));
     dispatch(checkBotoes(true));
   };
 
   const handleCancelFormulario = () => {
-    dispatch(checkForm(!estadoForm));
+    dispatch(checkForm(false));
     dispatch(checkBotoes(true));
-    setDescri("");
-    setDet("");
+    setDescricao("");
+    setDetalhamento("");
+    setStatus("concluido");
   };
 
   function handleSalvar() {
     const novoRecado: RecadoRequest = {
-      descricao: descri,
-      detalhamento: det,
-      status: status,
+      descricao,
+      detalhamento,
+      status,
     };
-    console.log(novoRecado);
+
     dispatch(criarRecado(novoRecado));
-    dispatch(checkForm(!estadoForm));
-    dispatch(checkBotoes(!estadoBotao));
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    dispatch(checkForm(false));
+    dispatch(checkBotoes(true));
+    dispatch(checkMostrar(false));
   }
 
   function handleEditar() {
     const novoRecado: Recado = {
-      id: recadoBuscado.id,
-      descricao: descri,
-      detalhamento: det,
-      status: status,
+      id: recado.id,
+      descricao,
+      detalhamento,
+      status,
     };
-    console.log("chamou atualizar");
     dispatch(atualizarRecado(novoRecado));
-    dispatch(updateOne({ id: recadoBuscado.id, changes: novoRecado }));
-    dispatch(checkForm(!estadoForm));
+    dispatch(checkForm(false));
   }
 
   useEffect(() => {
-    if (estadoBotao) {
-      setDescri("");
-      setDet("");
-      limparInfo();
-    } else {
-      setTimeout(() => {
-        setStatus(recadoBuscado.status);
-        setDescri(recadoBuscado.descricao);
-        setDet(recadoBuscado.detalhamento);
-      }, 1000);
+    if (estadoBotao && estadoForm) {
+      setStatus("concluido");
+      setDescricao("");
+      setDetalhamento("");
+    } else if (!estadoBotao && estadoForm) {
+      setStatus(recado.status);
+      setDescricao(recado.descricao);
+      setDetalhamento(recado.detalhamento);
     }
-  }, [estadoBotao]);
+  }, [estadoBotao, estadoForm]);
 
   useEffect(() => {
     dispatch(checkForm(false));
@@ -133,9 +114,11 @@ const Formulario: React.FC = () => {
 
   return (
     <>
-      <BtnStyled variant="contained" onClick={handleFormulario}>
-        <NoteAddIcon />
-      </BtnStyled>
+      <ButtonStyled
+        onClick={handleFormulario}
+        icon={<NoteAddIcon />}
+        txt={"Novo"}
+      />
       {estadoForm ? (
         <BoxForm>
           <RadioGroupStyled
@@ -161,39 +144,45 @@ const Formulario: React.FC = () => {
             />
           </RadioGroupStyled>
           <TextFieldStyled
-            id="input-descricao"
+            id="input-descricaocao"
             fullWidth
-            label="Descrição"
+            label="descricaoção"
             variant="outlined"
             placeholder="Digite aqui..."
-            onChange={(e) => setDescri(e.target.value)}
-            value={descri}
+            onChange={(e) => setDescricao(e.target.value)}
+            value={descricao}
           />
           <TextFieldStyled
-            id="input-detalhamento"
+            id="input-detalhamentoalhamento"
             fullWidth
-            label="Detalhamento"
+            label="detalhamentoalhamento"
             multiline
             rows={3}
             placeholder="Digite aqui..."
-            onChange={(e) => setDet(e.target.value)}
-            value={det}
+            onChange={(e) => setDetalhamento(e.target.value)}
+            value={detalhamento}
           />
 
           <BoxButtons>
             {estadoBotao ? (
-              <BtnStyled variant="contained" onClick={handleSalvar}>
-                <AddCircleIcon />
-              </BtnStyled>
+              <ButtonStyled
+                onClick={handleSalvar}
+                icon={<AddCircleIcon />}
+                txt={"Adicionar"}
+              />
             ) : (
-              <BtnStyled variant="contained" onClick={handleEditar}>
-                <CheckCircleIcon />
-              </BtnStyled>
+              <ButtonStyled
+                onClick={handleEditar}
+                icon={<CheckCircleIcon />}
+                txt={"Atualizar"}
+              />
             )}
 
-            <BtnStyled variant="contained" onClick={handleCancelFormulario}>
-              <CancelIcon />
-            </BtnStyled>
+            <ButtonStyled
+              onClick={handleCancelFormulario}
+              icon={<CancelIcon />}
+              txt={"Cancelar"}
+            />
           </BoxButtons>
         </BoxForm>
       ) : (

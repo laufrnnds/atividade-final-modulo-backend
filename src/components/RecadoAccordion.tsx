@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Accordion from "@mui/material/Accordion";
@@ -17,7 +17,6 @@ import {
   selectAll,
 } from "../store/Recados/RecadosSlice";
 import { Recado, RecadoRequest } from "../store/Recados/types";
-import { salvarInfo } from "../store/RecadoBuscado/RecadoBuscado";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -28,6 +27,14 @@ import {
   selectAllArquiv,
 } from "../store/Arquivados/ArquivadosSlice";
 import { checkMostrar } from "../store/Mostrar/MostrarSlice";
+import ButtonStyled from "./ButtonStyled";
+import { selecionarRecado } from "../store/Recados/RecadoSlice";
+
+// interface RecadoAccordionProps extends Recado {
+//   dado: Recado;
+//   color: string;
+//   arquivado: boolean;
+// }
 
 interface RecadoAccordionProps {
   id: number;
@@ -38,15 +45,6 @@ interface RecadoAccordionProps {
   color: string;
   arquivado: boolean;
 }
-
-const BtnStyled = styled(Button)({
-  margin: "5px",
-  "&:hover": {
-    backgroundColor: defaultTheme.palette.primary.light,
-  },
-  backgroundColor: defaultTheme.palette.primary.main,
-  fontFamily: '"Josefin Sans", sans-serif',
-});
 
 const BoxTxt = styled(Box)({
   width: "100%",
@@ -80,12 +78,19 @@ const RecadoAccordion: React.FC<RecadoAccordionProps> = ({
   const listaArquivados = useAppSelector(selectAllArquiv);
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    dispatch(checkMostrar(false));
+  }, [listaRecados]);
+
+  useEffect(() => {
+    dispatch(checkMostrar(true));
+  }, [listaArquivados]);
+
   const handleEditar = () => {
-    dispatch(salvarInfo({ id, descricao, detalhamento, status }));
+    console.log("entrou editar");
+    dispatch(selecionarRecado(dado));
     dispatch(checkBotoes(false));
-    setTimeout(() => {
-      dispatch(checkForm(true));
-    }, 3000);
+    dispatch(checkForm(true));
   };
 
   const handleApagar = () => {
@@ -93,34 +98,22 @@ const RecadoAccordion: React.FC<RecadoAccordionProps> = ({
       dispatch(removeOneArquiv(id));
     } else {
       dispatch(excluirRecado(id));
-      dispatch(removeOne(id));
     }
   };
 
   function handleArquivar() {
-    listaRecados.map((recado: Recado) => {
-      if (recado.id == id) {
-        dispatch(addOneArquiv(recado));
-        dispatch(excluirRecado(id));
-        dispatch(removeOne(id));
-      }
-    });
+    dispatch(addOneArquiv(dado));
+    dispatch(excluirRecado(id));
   }
 
   function handleDesarquivar() {
-    listaArquivados.map((recado: Recado) => {
-      if (recado.id == id) {
-        const novoRecado: RecadoRequest = {
-          descricao: descricao,
-          detalhamento: detalhamento,
-          status: status,
-        };
-        dispatch(removeOneArquiv(id));
-        dispatch(criarRecado(novoRecado));
-        window.location.reload();
-        dispatch(checkMostrar(false));
-      }
-    });
+    const novoRecado: RecadoRequest = {
+      descricao: descricao,
+      detalhamento: detalhamento,
+      status: status,
+    };
+    dispatch(removeOneArquiv(id));
+    dispatch(criarRecado(novoRecado));
   }
 
   return (
@@ -130,7 +123,7 @@ const RecadoAccordion: React.FC<RecadoAccordionProps> = ({
         aria-controls="panel1a-content"
         id="panel1a-header"
         sx={{
-          backgroundColor: `#${color}`,
+          backgroundColor: color,
           color: "white",
         }}
       >
@@ -164,20 +157,28 @@ const RecadoAccordion: React.FC<RecadoAccordionProps> = ({
           <></>
         )}
         <BoxButtons>
-          <BtnStyled variant="contained" onClick={handleEditar}>
-            <EditIcon />
-          </BtnStyled>
-          <BtnStyled variant="contained" onClick={handleApagar}>
-            <DeleteForeverIcon />
-          </BtnStyled>
+          <ButtonStyled
+            onClick={handleEditar}
+            icon={<EditIcon />}
+            txt={"Editar"}
+          />
+          <ButtonStyled
+            onClick={handleApagar}
+            icon={<DeleteForeverIcon />}
+            txt={"Deletar"}
+          />
           {arquivado ? (
-            <BtnStyled variant="contained" onClick={handleDesarquivar}>
-              <FileUploadIcon />
-            </BtnStyled>
+            <ButtonStyled
+              onClick={handleDesarquivar}
+              icon={<FileUploadIcon />}
+              txt={"Desarquivar"}
+            />
           ) : (
-            <BtnStyled variant="contained" onClick={handleArquivar}>
-              <FileDownloadIcon />
-            </BtnStyled>
+            <ButtonStyled
+              onClick={handleArquivar}
+              icon={<FileDownloadIcon />}
+              txt={"Arquivar"}
+            />
           )}
         </BoxButtons>
       </AccordionDetails>

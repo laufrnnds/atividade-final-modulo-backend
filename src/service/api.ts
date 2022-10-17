@@ -13,13 +13,18 @@ async function buscarRecadosApi(url: string) {
 async function criarRecadoApi(
   url: string,
   data: RecadoRequest
-): Promise<string> {
+): Promise<Recado> {
   try {
     const response = await api.post(url, data);
     return response.data;
   } catch (err) {
     console.log(err);
-    return "não foi possivel salvar";
+    return {
+      id: 0,
+      detalhamento: "",
+      descricao: "",
+      status: "concluido",
+    };
   }
 }
 
@@ -43,7 +48,7 @@ async function excluirRecadoApi(url: string): Promise<string> {
   }
 }
 
-async function atualizarRecadoApi(url: string, data: Recado): Promise<string> {
+async function atualizarRecadoApi(url: string, data: Recado): Promise<Recado> {
   try {
     const dataRequest = {
       descricao: data.descricao,
@@ -53,7 +58,12 @@ async function atualizarRecadoApi(url: string, data: Recado): Promise<string> {
     console.log(response.data);
     return response.data;
   } catch (err) {
-    return "não foi possivel atualizar o recado";
+    return {
+      id: 0,
+      detalhamento: "",
+      descricao: "",
+      status: "concluido",
+    };
   }
 }
 

@@ -1,9 +1,8 @@
-export interface Recado {
+export interface Recado extends RecadoRequest {
   id: number;
-  descricao: string;
-  detalhamento: string;
-  status: string;
 }
+
+export type Status = "concluido" | "pendente" | "cancelado";
 
 export interface RecadoRequest {
   descricao: string;

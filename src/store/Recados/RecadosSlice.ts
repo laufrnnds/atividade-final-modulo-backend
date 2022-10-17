@@ -57,7 +57,10 @@ export const excluirRecado = createAsyncThunk(
   async (id: number) => {
     const url = `/${id}`;
     const response = await excluirRecadoApi(url);
-    return response;
+    return {
+      message: response,
+      id,
+    };
   }
 );
 
@@ -106,17 +109,49 @@ const RecadosSlice = createSlice({
       state.loading = false;
       adapter.setAll(state, action.payload);
     });
+    builder.addCase(criarRecado.pending, (state, action) => {
+      state.loading = true;
+    });
     builder.addCase(criarRecado.fulfilled, (state, action) => {
       state.loading = false;
-      state.message = action.payload;
+      if (action.payload.id === 0) {
+        state.message = "Não foi possivel criar o recado";
+        return state;
+      }
+
+      state.message = "Recado salvo com sucesso!";
+      adapter.addOne(state, action.payload);
+    });
+    builder.addCase(atualizarRecado.pending, (state, action) => {
+      state.loading = true;
     });
     builder.addCase(atualizarRecado.fulfilled, (state, action) => {
       state.loading = false;
-      console.log(action.payload);
+
+      if (action.payload.id === 0) {
+        state.message = "Não foi possivel atualizar o recado.";
+        return state;
+      }
+
+      state.message = "Recado atualizado com sucesso!";
+      adapter.updateOne(state, {
+        id: action.payload.id,
+        changes: action.payload,
+      });
+    });
+    builder.addCase(excluirRecado.pending, (state, action) => {
+      state.loading = true;
     });
     builder.addCase(excluirRecado.fulfilled, (state, action) => {
       state.loading = false;
-      console.log(action.payload);
+
+      if (action.payload.message === "não foi possivel excluir") {
+        state.message = action.payload.message;
+        return state;
+      }
+
+      state.message = action.payload.message;
+      adapter.removeOne(state, action.payload.id);
     });
     builder.addCase(filtrarRecados.fulfilled, (state, action) => {
       state.loading = false;

@@ -6,17 +6,19 @@ import {
   RadioGroup,
   TextField,
   Box,
+  Grid,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import defaultTheme from "../config/theme/Default";
-import { checkFiltro } from "../store/Filtrar/FiltrarSlice";
+import { checkFiltro, selectFiltro } from "../store/Filtrar/FiltrarSlice";
 import { checkForm } from "../store/Form/FormSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { buscarRecados, filtrarRecados } from "../store/Recados/RecadosSlice";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import PlagiarismIcon from "@mui/icons-material/Plagiarism";
 import CancelIcon from "@mui/icons-material/Cancel";
+import ButtonStyled from "./ButtonStyled";
 
 const BoxForm = styled(Box)({
   width: "50%",
@@ -48,6 +50,7 @@ const RadioGroupStyled = styled(RadioGroup)({
 });
 
 const BoxButtons = styled(Box)({
+  width: "100%",
   margin: "20px",
   display: "flex",
   justifyContent: "space-evenly",
@@ -67,48 +70,33 @@ const BtnStyled = styled(Button)({
 const Filtragem: React.FC = () => {
   const [busca, setBusca] = useState("");
   const [value, setValue] = useState("descricao");
-  const estadoFiltro = useAppSelector((state) => state.filtrar.filtrar.payload);
+  const estadoFiltro = useAppSelector(selectFiltro).filtrar;
   const dispatch = useAppDispatch();
 
   const handleFiltro = () => {
     dispatch(checkForm(false));
-    dispatch(checkFiltro(!estadoFiltro));
+    dispatch(checkFiltro(true));
   };
 
   const handleBusca = () => {
-    console.log(value);
-    let tipoOperacao: string = "";
-    if (value === "descricao") {
-      tipoOperacao = "descricao";
-    } else if (value === "detalhamento") {
-      tipoOperacao = "detalhamento";
-    } else {
-      tipoOperacao = "status";
-    }
     dispatch(filtrarRecados({ busca: busca, operacao: value }));
   };
 
   const handleCancelFormFiltro = () => {
     dispatch(buscarRecados());
-    dispatch(checkFiltro(!estadoFiltro));
-    setBusca("");
-  };
-
-  useEffect(() => {
     dispatch(checkFiltro(false));
-  }, []);
-
-  useEffect(() => {
-    if (value == "descricao" || value == "detalhamento") {
-      setBusca("");
-    }
-  }, [value]);
+    dispatch(checkFiltro(false));
+    setBusca("");
+    setValue("descricao");
+  };
 
   return (
     <>
-      <BtnStyled variant="contained" onClick={handleFiltro}>
-        <FilterAltIcon />
-      </BtnStyled>
+      <ButtonStyled
+        onClick={handleFiltro}
+        icon={<FilterAltIcon />}
+        txt={"Filtrar"}
+      />
       {estadoFiltro ? (
         <BoxForm>
           <BoxItens>
@@ -187,13 +175,42 @@ const Filtragem: React.FC = () => {
             )}
 
             <BoxButtons>
-              <BtnStyled variant="contained" onClick={handleBusca}>
-                <PlagiarismIcon />
-              </BtnStyled>
-
-              <BtnStyled variant="contained" onClick={handleCancelFormFiltro}>
-                <CancelIcon />
-              </BtnStyled>
+              <Grid container>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  xl={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                  }}
+                >
+                  <ButtonStyled
+                    onClick={handleBusca}
+                    icon={<PlagiarismIcon />}
+                    txt={"Buscar"}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  xl={6}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                  }}
+                >
+                  <ButtonStyled
+                    onClick={handleCancelFormFiltro}
+                    icon={<CancelIcon />}
+                    txt={"Cancelar"}
+                  />
+                </Grid>
+              </Grid>
             </BoxButtons>
           </BoxItens>
         </BoxForm>
