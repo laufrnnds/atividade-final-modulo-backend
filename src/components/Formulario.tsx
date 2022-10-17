@@ -144,18 +144,18 @@ const Formulario: React.FC = () => {
             />
           </RadioGroupStyled>
           <TextFieldStyled
-            id="input-descricaocao"
+            id="input-descricao"
             fullWidth
-            label="descricaoção"
+            label="Descrição"
             variant="outlined"
             placeholder="Digite aqui..."
             onChange={(e) => setDescricao(e.target.value)}
             value={descricao}
           />
           <TextFieldStyled
-            id="input-detalhamentoalhamento"
+            id="input-detalhamento"
             fullWidth
-            label="detalhamentoalhamento"
+            label="Detalhamento"
             multiline
             rows={3}
             placeholder="Digite aqui..."
