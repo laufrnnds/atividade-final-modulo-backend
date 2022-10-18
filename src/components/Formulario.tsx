@@ -6,7 +6,11 @@ import defaultTheme from "../config/theme/Default";
 import { checkBotoes, selectBotao } from "../store/Botoes/BotoesSlice";
 import { checkForm, selectForm } from "../store/Form/FormSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { atualizarRecado, criarRecado } from "../store/Recados/RecadosSlice";
+import {
+  atualizarRecado,
+  buscarRecados,
+  criarRecado,
+} from "../store/Recados/RecadosSlice";
 import { Recado, RecadoRequest, Status } from "../store/Recados/types";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -76,7 +80,7 @@ const Formulario: React.FC = () => {
     const novoRecado: RecadoRequest = {
       descricao,
       detalhamento,
-      status,
+      status: status,
     };
 
     dispatch(criarRecado(novoRecado));
@@ -90,10 +94,12 @@ const Formulario: React.FC = () => {
       id: recado.id,
       descricao,
       detalhamento,
-      status,
+      status: status,
     };
+    console.log(novoRecado);
     dispatch(atualizarRecado(novoRecado));
     dispatch(checkForm(false));
+    dispatch(buscarRecados());
   }
 
   useEffect(() => {

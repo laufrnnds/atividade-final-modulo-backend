@@ -53,6 +53,7 @@ async function atualizarRecadoApi(url: string, data: Recado): Promise<Recado> {
     const dataRequest = {
       descricao: data.descricao,
       detalhamento: data.detalhamento,
+      status: data.status,
     };
     const response = await api.put(`${url}`, dataRequest);
     console.log(response.data);
